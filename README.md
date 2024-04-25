@@ -27,7 +27,6 @@ einops
 2. modify the following parameters in `data_fsc147/prepare_data.sh`:
     - Let `ori_root` be the local path of FSC-147.
     - Let `new_root` be the path that you want to save the modified FSC-147.
-3. Download 
 3. execute the script: 
 ```shell
 cd data_fsc147
