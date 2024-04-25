@@ -99,7 +99,7 @@ def main_worker(config):
     logger.info("Start training")
     start_time = time.time()
     maestack, msestack, lossstack, epostack = [], [], [], []
-    scaler = GradScaler()
+    scaler = GradScaler(init_scale=16.)
     for epoch in range(config.TRAIN.START_EPOCH, config.TRAIN.EPOCHS):
 
         train_one_epoch(config, model, criterion, data_loader_train, optimizer, epoch, lr_scheduler, scaler)
@@ -119,7 +119,7 @@ def main_worker(config):
             if mae * 2 + mse < max_accuracy[0] * 2 + max_accuracy[1]:
                 save_checkpoint(config, "best", model_without_ddp, max_accuracy, optimizer, lr_scheduler, logger)
                 max_accuracy = (mae, mse, loss)
-            logger.info(f'Min total MAE|MSE|Loss: {max_accuracy[0]:.6f} | {max_accuracy[1]:.2f} | {max_accuracy[2] * 1e5:.2f}')
+            logger.info(f'Min total MAE|MSE|Loss: {max_accuracy[0]:.2f} | {max_accuracy[1]:.2f} | {max_accuracy[2]:.2f}')
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
@@ -181,7 +181,7 @@ def train_one_epoch(config, model, criterion, data_loader, optimizer, epoch, lr_
 
                 if torch.isnan(grad_norm) or torch.isinf(grad_norm):
                     grad_norm = None
-                    logger.info(f"grad_norm is nan or inf. Ignore this batch.")
+                    logger.info(f"grad_norm is nan or inf. Ignore this batch. AMP scale={scaler.get_scale()}")
                 else:
                     scaler.step(optimizer)
                     
@@ -200,7 +200,7 @@ def train_one_epoch(config, model, criterion, data_loader, optimizer, epoch, lr_
                     grad_norm = get_grad_norm(model.parameters())
                 if torch.isnan(grad_norm) or torch.isinf(grad_norm):
                     grad_norm = None
-                    logger.info(f"grad_norm is nan or inf. Ignore this batch")
+                    logger.info(f"grad_norm is nan or inf. Ignore this batch.")
                 else:
                     optimizer.step()
                 optimizer.zero_grad()
@@ -224,8 +224,8 @@ def train_one_epoch(config, model, criterion, data_loader, optimizer, epoch, lr_
                 f'Train: [{epoch}/{config.TRAIN.EPOCHS}][{idx}/{num_steps}]\t'
                 f'eta {datetime.timedelta(seconds=int(etas))} lr {lr*1e5:.3f}\t'
                 f'time {batch_time.val:.4f} ({batch_time.avg:.4f})\t'
-                f'loss {loss_meter.val * 1e3:.3f} ({loss_meter.avg * 1e3:.3f})\t'
-                f'grad_norm {norm_meter.val * 1e3:.3f} ({norm_meter.avg * 1e3:.3f})\t'
+                f'loss {loss_meter.val:.3f} ({loss_meter.avg:.3f})\t'
+                f'grad_norm {norm_meter.val:.3f} ({norm_meter.avg:.3f})\t'
                 f'mem {memory_used:.0f}MB\t'
                 )
     epoch_time = time.time() - start

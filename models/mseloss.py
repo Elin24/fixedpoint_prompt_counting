@@ -27,7 +27,7 @@ class MSELoss(nn.modules.loss._Loss):
     def __init__(self, factor, reduction='sum') -> None:
         super().__init__()
         
-        self.gsize = 25
+        self.gsize = 17
         self.register_buffer('gaussian', agaussian(self.gsize, sigma=4))
         self.factor = factor
 

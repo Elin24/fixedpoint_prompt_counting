@@ -49,8 +49,8 @@ _C.MODEL.FACTOR = 1.
 # -----------------------------------------------------------------------------
 _C.TRAIN = CN()
 _C.TRAIN.START_EPOCH = 0
-_C.TRAIN.EPOCHS = 240
-_C.TRAIN.WARMUP_EPOCHS = 30
+_C.TRAIN.EPOCHS = 200
+_C.TRAIN.WARMUP_EPOCHS = int(_C.TRAIN.EPOCHS * 0.1)
 _C.TRAIN.WEIGHT_DECAY = 0.95
 
 scale = 1

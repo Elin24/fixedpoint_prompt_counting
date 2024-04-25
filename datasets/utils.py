@@ -24,8 +24,7 @@ class NormalSample(object):
         ]) if train else None
 
         self.aug = transforms.Compose([
-            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.4),
-            transforms.RandomApply([GaussianBlur([.1, 2.])], p=0.4),
+            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8)
         ]) if train else None
 
         self.totensor = transforms.ToTensor()
