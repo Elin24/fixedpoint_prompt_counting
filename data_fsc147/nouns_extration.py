@@ -27,7 +27,7 @@ def llama_description(data_root, ques, llama_model_weights = "llama_model_weight
     for imgpath in tqdm.tqdm(sorted(glob.glob(os.path.join(img_root, '*.jpg')))):
         imgf = os.path.basename(imgpath)
         img = Image.open(imgpath)
-        img = preprocess(img).unsquee
+        img = preprocess(img).unsqueeze()
         result = model.generate(img, [prompt])[0]
         descrbs[imgf] = result
 
